@@ -8,7 +8,7 @@
 /* ─────────────────────────── SVĚT ─────────────────────────── */
 
 const W = 1200, H = 720;          // logické rozměry mapy
-const SPEED   = 85;               // px za sekundu
+const SPEED   = 50;               // px za sekundu
 const DAY_PX  = 80;               // kolik px plavby je jeden den
 const CAPACITY = 20;              // kapacita podpalubí
 const START_GOLD = 500;
@@ -734,7 +734,7 @@ function drawShip(pl, time){
   ctx.save();
   ctx.translate(p.x, p.y + bob * 1.3);
   ctx.rotate(pl.docked ? -0.06 : p.a + Math.PI / 2 + bob * 0.045);
-  ctx.scale(0.92, 0.92);
+  ctx.scale(1.45, 1.45);
 
   // stín na hladině
   ctx.save();
@@ -779,14 +779,14 @@ function drawShip(pl, time){
   ctx.save();
   ctx.font = '12px "IM Fell English", Georgia, serif';
   ctx.textAlign = 'center';
-  const t = pl.name.split(' ')[0];
+  const t = pl.name.length > 14 ? pl.name.slice(0, 13) + '…' : pl.name;
   const w = ctx.measureText(t).width;
   ctx.fillStyle = 'rgba(240,229,201,.8)';
-  ctx.fillRect(p.x - w/2 - 4, p.y - 40, w + 8, 15);
+  ctx.fillRect(p.x - w/2 - 4, p.y - 52, w + 8, 15);
   ctx.strokeStyle = pl.color; ctx.lineWidth = 1;
-  ctx.strokeRect(p.x - w/2 - 4, p.y - 40, w + 8, 15);
+  ctx.strokeRect(p.x - w/2 - 4, p.y - 52, w + 8, 15);
   ctx.fillStyle = '#2b1d10';
-  ctx.fillText(t, p.x, p.y - 29);
+  ctx.fillText(t, p.x, p.y - 41);
   ctx.restore();
 }
 
