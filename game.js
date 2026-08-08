@@ -253,7 +253,6 @@ function openPort(pl){
   pl.known[port] = { prices: S.prices[port].slice(), day: S.day };
 
   $('#portName').textContent = PORTS[port].name;
-  $('#portOverline').textContent = PORTS[port].motto;
   $('#captainName').textContent = pl.name;
   $('#captainFlag').style.background = pl.color;
 
