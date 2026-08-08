@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LODĚ — Mare Mercatorum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Cutive+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ══════════════════════════ SETUP ══════════════════════════ -->
+<section id="setup" class="screen">
+  <div class="sheet setup-sheet">
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+
+    <p class="overline">Anno Domini MDCLXXIII &nbsp;·&nbsp; Kupecká gilda</p>
+    <h1 class="title">Lodě</h1>
+    <p class="subtitle"><i>Mare Mercatorum</i> — pět přístavů, pět druhů zboží, jediné jmění.</p>
+
+    <div class="rule"></div>
+
+    <div class="setup-grid">
+      <div class="field">
+        <label class="lbl">Počet kapitánů</label>
+        <div class="segmented" id="playerCount">
+          <button type="button" data-n="2">II</button>
+          <button type="button" data-n="3" class="on">III</button>
+          <button type="button" data-n="4">IV</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Cíl plavby &mdash; jmění</label>
+        <div class="segmented" id="goalPick">
+          <button type="button" data-g="2000">2 000</button>
+          <button type="button" data-g="3500" class="on">3 500</button>
+          <button type="button" data-g="5000">5 000</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="playerFields" class="players"></div>
+
+    <button id="startBtn" class="btn btn-lg">Vyplout&nbsp;&nbsp;⚓</button>
+
+    <details class="rules">
+      <summary>Pravidla plavby</summary>
+      <ul>
+        <li>Každý kapitán velí jedné lodi. Lodě plují plynule mezi dvěma přístavy.</li>
+        <li>Jakmile <b>kterákoli</b> loď dorazí do přístavu, celá plavba se zastaví a otevře se přístavní kancelář jejího kapitána.</li>
+        <li>V přístavu lze nakupovat a prodávat zboží za místní ceny, poté se volí další cíl.</li>
+        <li>Ceny kolísají. Co je v jednom přístavu levné, bývá jinde vzácné — v tom je celý obchod.</li>
+        <li>Vítězí první kapitán, který nashromáždí stanovené jmění ve zlatě.</li>
+      </ul>
+    </details>
+  </div>
+</section>
+
+<!-- ══════════════════════════ HRA ══════════════════════════ -->
+<section id="game" class="screen" hidden>
+  <header id="hud">
+    <div class="hud-brand">
+      <span class="hud-title">Lodě</span>
+      <span class="hud-clock">Den <b id="dayCount">1</b></span>
+      <span class="hud-goal">Cíl <b id="goalLabel">3 500</b> zl.</span>
+    </div>
+    <div id="fleetStrip" class="fleet-strip"></div>
+  </header>
+
+  <div id="mapWrap">
+    <canvas id="map"></canvas>
+    <div id="log" class="log"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ PŘÍSTAV ══════════════════════════ -->
+<div id="portScreen" class="modal" hidden>
+  <div class="sheet port-sheet">
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+
+    <header class="port-head">
+      <div>
+        <p class="overline" id="portOverline">Přístavní kancelář</p>
+        <h2 class="port-name" id="portName">—</h2>
+      </div>
+      <div class="captain-badge" id="captainBadge">
+        <span class="flag" id="captainFlag"></span>
+        <div>
+          <p class="captain-name" id="captainName">—</p>
+          <p class="captain-sub">kapitán u kormidla</p>
+        </div>
+      </div>
+    </header>
+
+    <div id="newsBanner" class="news" hidden></div>
+
+    <div class="port-body">
+      <!-- TRH -->
+      <div class="market">
+        <div class="section-head"><span>Tržnice</span><span class="hint">ceny za kus</span></div>
+        <table class="ledger">
+          <thead>
+            <tr>
+              <th class="c-good">Zboží</th>
+              <th class="c-num">Nákup</th>
+              <th class="c-num">Prodej</th>
+              <th class="c-num">V podpalubí</th>
+              <th class="c-act">Obchod</th>
+            </tr>
+          </thead>
+          <tbody id="marketRows"></tbody>
+        </table>
+      </div>
+
+      <!-- STAV -->
+      <aside class="purse">
+        <div class="section-head"><span>Lodní deník</span></div>
+        <div class="stat">
+          <span class="stat-lbl">Zlato</span>
+          <span class="stat-val" id="statGold">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-lbl">Náklad</span>
+          <span class="stat-val" id="statCargo">0 / 20</span>
+        </div>
+        <div class="hold-bar"><div id="holdFill"></div></div>
+        <ul id="holdList" class="hold-list"></ul>
+        <p class="purse-note" id="netWorth">—</p>
+      </aside>
+    </div>
+
+    <div class="rule"></div>
+
+    <!-- KURZ -->
+    <div class="section-head"><span>Kam dál?</span><span class="hint">vyber přístav a vyplouvej</span></div>
+    <div id="destGrid" class="dest-grid"></div>
+
+    <button id="sailBtn" class="btn btn-lg" disabled>Zvol cílový přístav</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════ KONEC ══════════════════════════ -->
+<div id="endScreen" class="modal" hidden>
+  <div class="sheet end-sheet">
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+    <p class="overline">Konec plavby</p>
+    <h2 class="title" id="winnerName">—</h2>
+    <p class="subtitle" id="winnerLine">—</p>
+    <div class="rule"></div>
+    <ol id="finalBoard" class="final-board"></ol>
+    <button id="againBtn" class="btn btn-lg">Nová plavba</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
