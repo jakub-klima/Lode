@@ -41,7 +41,7 @@ const COLORS = [
   { hex:'#a9781f', name:'okr'       },
 ];
 
-const DEFAULT_NAMES = ['Kryštof Vraný', 'Johana Šípová', 'Vilém Kotva', 'Marta Bouřná'];
+const DEFAULT_NAMES = ['Hráč 1', 'Hráč 2', 'Hráč 3', 'Hráč 4'];
 
 const dist = (a, b) => Math.hypot(PORTS[a].x - PORTS[b].x, PORTS[a].y - PORTS[b].y);
 const days = (a, b) => Math.max(1, Math.round(dist(a, b) / DAY_PX));
